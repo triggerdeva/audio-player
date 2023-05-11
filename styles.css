@@ -40,9 +40,6 @@ main{
     text-decoration: underline;
     text-decoration-style: double;
 }
-.hide-page{
-    display: none
-}
 .page-container{
     flex:  1 1 auto;
 }
@@ -93,4 +90,113 @@ nav{
 .loader img {
     height: 80px;
     width: auto;
+}
+
+#top-tracks-container{
+    display:flex;
+    padding: 10px;
+    border-radius:12px;
+    width: 100%;
+    gap: 10px;
+    overflow: auto;
+    height:max-content;
+}
+
+.track-card{
+    position: relative;
+    height: 200px;
+    width: 150px;
+    flex: 0 0 150px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.track-card-content{
+    opacity: 0;
+    transition: .3s ease opacity;
+    position: absolute;
+    inset: 0px;
+    z-index: 10;
+    /* background-color: red; */
+    border-radius: 12px;
+}
+.track-card-content h3{
+    text-align: center;
+    color: white;
+    width: max-content;
+    margin: 1px auto;
+    box-shadow: -18px 3px 36px rgba(0,0,0,1);
+
+}
+.track-card-content .play{
+    position: absolute;
+    inset: 0px;
+    margin: auto;
+    height: max-content;
+    width: max-content;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: black;
+    outline: none;
+    border: none;
+}
+.track-card-content .add-to-playlist{
+    position: absolute;
+    z-index: 20;
+    z-index: 20;
+    bottom: 10px;
+    right: 10px;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: black;
+    outline: none;
+    border: none;
+}
+.track-card-content .add-to-queue{
+    position: absolute;
+    z-index: 20;
+    bottom: 10px;
+    left: 10px;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: black;
+    outline: none;
+    border: none;
+}
+.track-card-content .play img,
+.track-card-content .add-to-queue img,
+.track-card-content .add-to-playlist img{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    filter: invert();
+    cursor:pointer;
+}
+.track-card:hover .track-card-content{
+    opacity: 1;  
+}
+
+.track-image{
+    position: absolute;
+    height: 100%;
+    width : 100%;
+    inset: 0px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+
+
+
+
+
+
+
+.hide-page{
+    display: none
+}
+.hide{
+    display: none
 }
