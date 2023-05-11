@@ -7,8 +7,17 @@ export const getTopTracks = async () => {
     }catch(error){
         console.log(error)
         return  {data : null, error : error}
-    }
-    
+    } 
+}
+
+export const getAlbumTracks = async (link) => {
+    try{
+        const data = await fetch(`${link}?apikey=${API_KEY}`)
+        return {data : data.json(), error : null};
+    }catch(error){
+        console.log(error)
+        return  {data : null, error : error}
+    } 
 }
 export const getPopularArtist = async () => {
     try{
@@ -34,7 +43,7 @@ export const getTopPlaylist = async () => {
 }
 export const getTopAlbums = async () => {
     try{
-        const fetchURL = `https://napi-v2-2-cloud-run-b3gtd5nmxq-uw.a.run.app/v2.2/albums/new?apikey=${API_KEY}&limit=10`;
+        const fetchURL = `https://napi-v2-2-cloud-run-b3gtd5nmxq-uw.a.run.app/v2.2/albums/new?apikey=${API_KEY}&limit=4`;
         const data = await fetch(fetchURL)
         return {data : data.json(), error : null};
     }catch(error){
@@ -56,29 +65,3 @@ export const searchSong = async (query, type) => {
         return  {data : null, error : error}
     }
 }
-
-/* 
-
-// normal funciton
-function someFun () {
-
-}
-
-// arrow
-const someFun = () => {
-
-}
-
-*/
-/* 
-
-
-## getTopTracks link :
-
-## getPopularArtist link :
-
-## getTopPlaylist link :
-
-## getTopAlbums link :
-
-*/

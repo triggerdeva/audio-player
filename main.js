@@ -2,7 +2,7 @@ const data = new Map([]);
 /******* 
   fetching data
 *********/
-import { getPopularArtist, getTopAlbums, getTopTracks, getTopPlaylist,searchSong } from "./api.js";
+import { getPopularArtist, getTopAlbums, getTopTracks, getTopPlaylist,searchSong,getAlbumTracks } from "./api.js";
 const getHomePageData = async () => {
     console.log("fetching data");
     const tracks = await getTopTracks()
@@ -92,20 +92,16 @@ const renderHomePage = async () => {
 
 async function renderTracks(container,tracksList){
     const {tracks} = tracksList;
-    console.log("rendering ", tracks)
     tracks.forEach(track => {
-        const htmlString = getCardHtml(track);
-        container.insertAdjacentHTML("beforeend",htmlString)
+        container.append(getCardElement(track))
     });
     console.log("current data is", data);
 }
-async function renderAlbums(container,albumList){
-    console.log("rendering ",albumList)
+function renderAlbums(container,albumList){
     const {albums} = albumList;
-    console.log("rendering ", albums)
-    albums.forEach(album => {
-        const htmlString = getAlbumHtml(album);
-        container.insertAdjacentHTML("beforeend",htmlString)
+    albums.forEach(async (album) => {
+        let albumElement = await getAlbum(album)
+        container.append(albumElement)
     });
     
 }
@@ -115,7 +111,7 @@ async function renderPlaylists(container,playlistList){
     // console.log("rendering ", tracksList)
     // tracksList.forEach(track => {
     //     const cardHtml = getCardHtml(track);
-    //     container.insertAdjacentHTML("beforeend",cardHtml)
+    //     container.append("beforeend",cardHtml)
     // });
     
 }
@@ -125,34 +121,62 @@ async function renderArtists(container,artistList){
     // console.log("rendering ", tracksList)
     // tracksList.forEach(track => {
     //     const cardHtml = getCardHtml(track);
-    //     container.insertAdjacentHTML("beforeend",cardHtml)
+    //     container.append("beforeend",cardHtml)
     // });
 
 }
 
-function getAlbumHtml(album){
-    console.log("get albumHtml",album)
-    const htmlString = `
-
-    `;
-    return htmlString;
+async function getAlbum(album){
+    const { links:{tracks : {href : link}}} = album
 }
 
-function getCardHtml(track){
+async function createAlbumFragment(album){
+    const {data, error} = await getAlbumTracks(link);
+    const {tracks} =  await data;
+
+    const container = document.createElement("div");
+    container.classList.add("individual-album");
+}
+
+function getCardElement(track){
     data.set(track.id,track);
-    const htmlString = `
-    <div class="track-card">
-        <img class="track-image" src="https://api.napster.com/imageserver/v2/albums/${track.albumId}/images/500x500.jpg" alt="">
-        <div class="track-card-content">
-            <h3>${track.albumName}</h3>
-            <button data-action="play" data-id="${track.id}" class="play"><img src="./images/play-button.png" alt=""></button>
-            <button data-action="playlist" data-id="${track.id}" class="add-to-playlist"><img src="./images/playlist.png" alt=""></button>
-            <button data-action="queue" data-id="${track.id}" class="add-to-queue"><img src="./images/queue.png" alt=""></button>
+    const template = document.createElement("template");
+    template.innerHTML = `
+    <div class='track-card'>
+        <img class='track-image' src='' alt=''>
+        <div class='track-card-content'>
+            <h3 class='track-title'></h3>
+            <button data-action='play' data-id='' class='play'><img src='./images/play-button.png' alt=''></button>
+            <button data-action='playlist' data-id='' class='add-to-playlist'><img src='./images/playlist.png' alt=''></button>
+            <button data-action='queue' data-id='' class='add-to-queue'><img src='./images/queue.png' alt=''></button>
         </div>
     </div>
     `;
-    return htmlString;
+    const element = template.content.cloneNode(true);
+    element.querySelector(".track-image").src = `https://api.napster.com/imageserver/v2/albums/${track.albumId}/images/500x500.jpg` 
+    element.querySelector(".track-title").innerText =  track.albumName
+    const playButton = element.querySelector(".play"); 
+    const queueButton = element.querySelector(".add-to-playlist")
+    const playlistButton = element.querySelector(".add-to-queue")
+    playButton.dataset.id = track.id 
+    queueButton.dataset.id = track.id 
+    playlistButton.dataset.id = track.id 
+    playButton.addEventListener("click", (e) => {
+        console.log(track.id);
+    })
+    queueButton.addEventListener("click", (e) => {
+        console.log(track.id);
+    })
+    playlistButton.addEventListener("click", (e) => {
+        console.log(track.id);
+    })
+    return element;
 }
+
+/**********
+ * Evnet listner
+***********/
+
 
 /********
  * loading the app
