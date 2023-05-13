@@ -99,6 +99,7 @@ async function renderTracks(container,tracksList){
 }
 function renderAlbums(container,albumList){
     const {albums} = albumList;
+    console.log("function 1",container,albumList);
     albums.forEach(async (album) => {
         let albumElement = await getAlbum(album)
         container.append(albumElement)
@@ -128,17 +129,28 @@ async function renderArtists(container,artistList){
 
 async function getAlbum(album){
     const { links:{tracks : {href : link}}} = album
+    console.log("function 2", link)
+    const albumFragment = await createAlbumFragment(link);
+    return albumFragment;
 }
 
-async function createAlbumFragment(album){
+async function createAlbumFragment(link){
     const {data, error} = await getAlbumTracks(link);
     const {tracks} =  await data;
+    console.log("function 3", tracks)
 
     const container = document.createElement("div");
     container.classList.add("individual-album");
+    tracks.forEach(async (track) => {
+        const trackCard = await getCardElement(track)
+        container.append(trackCard)
+    })
+    console.log(container)
+    return container;
 }
 
 function getCardElement(track){
+    // console.log(data)
     data.set(track.id,track);
     const template = document.createElement("template");
     template.innerHTML = `
@@ -154,7 +166,7 @@ function getCardElement(track){
     `;
     const element = template.content.cloneNode(true);
     element.querySelector(".track-image").src = `https://api.napster.com/imageserver/v2/albums/${track.albumId}/images/500x500.jpg` 
-    element.querySelector(".track-title").innerText =  track.albumName
+    element.querySelector(".track-title").innerText =  track.name
     const playButton = element.querySelector(".play"); 
     const queueButton = element.querySelector(".add-to-playlist")
     const playlistButton = element.querySelector(".add-to-queue")

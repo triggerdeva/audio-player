@@ -27,10 +27,19 @@ main{
     grid-column: 2/3;
     background-color: rgb(112, 224, 247);
     border-radius: 10px;
-    /* display: flex; */
-    /* flex-direction: column; */
+}
+.main-container{
+    border-radius: 10px;
+    height: 100%;
+    max-height: 100%;
+    overflow: auto;
+    display: flex; 
+    flex-direction: column;
     padding: 10px;
     gap: 10px;
+    overflow: auto;
+    max-height: calc(100vh - 120px);
+    
 }
 #music-player-bar{
     grid-row: 2/3;
@@ -233,6 +242,16 @@ nav{
     inset: 0px;
     border-radius: 12px;
     object-fit: cover;
+}
+
+.individual-album{
+    display:flex;
+    padding: 10px;
+    border-radius:12px;
+    width: 100%;
+    gap: 10px;
+    overflow: auto;
+    height:max-content;
 }
 
 
