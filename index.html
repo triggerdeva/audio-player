@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./styles.css">
-    <script src="./main.js" type="module" defer ></script>
+    <script src="./main.js" type="module" defer></script>
     <title>Document</title>
 </head>
+
 <body>
     <div class="app-container">
         <aside>
@@ -33,29 +35,26 @@
                         <div id="home-page-content" class="page-content hide">
                             <h2 class="title-heading">Top Tracks</h2>
                             <div id="top-tracks-container">
-                                
+
                             </div>
                             <h2 class="title-heading">Top Albums</h2>
                             <div id="top-albums-container">
-            
+
                             </div>
                             <h2 class="title-heading">Top Artist</h2>
                             <div id="top-artists-container">
-            
+
                             </div>
-                            <h2 class="title-heading">Top playlist</h2>
-                            <div id="top-playlists-container">
-            
-                            </div>
+
                         </div>
-                    
+
                     </div>
                     <div id="collection-page" class="page hide-page">
                         <div id="collection-loader" class="loader">
                             <img src="./images/loading.svg" alt="">
                         </div>
                         <div id="collection-page-content" class="page-content hide">
-    
+
                         </div>
                     </div>
                     <div id="history-page" class="page hide-page">
@@ -63,15 +62,32 @@
                             <img src="./images/loading.svg" alt="">
                         </div>
                         <div id="history-page-content" class="page-content hide">
-    
+
                         </div>
                     </div>
                 </div>
             </div>
         </main>
         <div id="music-player-bar">
-
+            <div class="current-song-details">
+                <img src="./images/profile.png" alt="">
+                <span id="current-song-name">some song</span>
+                <span id="current-song-artist">some artists</span>
+            </div>
+            <div class="player-controls-container">
+                <div class="control-buttons">
+                    <img id="audio-backward" src="./images/backward.png" alt="backward">
+                    <img id="audio-pause" src="./images/pause.png" alt="play">
+                    <img id="audio-play" src="./images/play.png" alt="pause">
+                    <img id="audio-forward" src="./images/forward.png" alt="forward">
+                </div>
+                <div class="seek-bars">
+                    <input id="audio-time" type="range" id="audio-time">
+                    <input id="audio-volume" type="range">
+                </div>
+            </div>
         </div>
     </div>
 </body>
+
 </html>
