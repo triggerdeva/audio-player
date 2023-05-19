@@ -12,13 +12,15 @@
     <script src="./main.js" type="module" defer></script>
     <title>Document</title>
 </head>
-
 <body>
     <div class="app-container">
         <aside>
             <h2>Songs Queue</h2>
             <div class="songs-queue-container">
-
+                <h2>currently playing</h2>
+                <div id="currently-playing"></div>
+                <h2>up next</h2>
+                <div id="playing-next"></div>
             </div>
         </aside>
         <main>
@@ -40,36 +42,24 @@
                         </div>
                         <div id="home-page-content" class="page-content hide">
                             <h2 class="title-heading">Top Tracks</h2>
-                            <div id="top-tracks-container">
-
-                            </div>
+                            <div id="top-tracks-container"></div>
                             <h2 class="title-heading">Top Albums</h2>
-                            <div id="top-albums-container">
-
-                            </div>
+                            <div id="top-albums-container"></div>
                             <h2 class="title-heading">Top Artist</h2>
-                            <div id="top-artists-container">
-
-                            </div>
-
+                            <div id="top-artists-container"></div>
                         </div>
-
                     </div>
                     <div id="collection-page" class="page hide-page">
                         <div id="collection-loader" class="loader">
                             <img src="./images/loading.svg" alt="">
                         </div>
-                        <div id="collection-page-content" class="page-content hide">
-
-                        </div>
+                        <div id="collection-page-content" class="page-content hide"></div>
                     </div>
                     <div id="search-page" class="page hide-page">
                         <div id="search-loader" class="loader">
                             <img src="./images/loading.svg" alt="">
                         </div>
-                        <div id="search-page-content" class="page-content hide">
-
-                        </div>
+                        <div id="search-page-content" class="page-content hide"></div>
                     </div>
                 </div>
             </div>

@@ -196,10 +196,10 @@ function getCardElement(track) {
         playSong(data.get(track.id))
     });
     queueButton.addEventListener("click", (e) => {
-        console.log(track.id);
+        addSongToQueue(data.get(track.id));
     });
     playlistButton.addEventListener("click", (e) => {
-        console.log(track.id);
+        addSongToPlaylist(data.get(track.id));
     });
     return element;
 }
@@ -226,7 +226,10 @@ const audioElement = new Audio();
 
 const songNameElement = document.getElementById("current-song-name");
 const songArtistElement = document.getElementById("current-song-artist");
-const songImageElement = document.getElementById("current-song-image");
+const songImageElement = document.getElementById("current-song-image")
+;
+const currenltyPlayingContainer = document.getElementById("currently-playing");
+const playingNextContainer = document.getElementById("playing-next");
 
 const playButton = document.getElementById("audio-play");
 const pauseButton = document.getElementById("audio-pause");
@@ -247,14 +250,26 @@ audioElement.addEventListener("canplaythrough", (event) => {
     pauseButton.classList.remove("hide");
     // when song is done playing clear the interval
 });
-
+audioElement.addEventListener("ended", () => {
+    console.log("ended running");
+    playButton.classList.add("hide")
+    pauseButton.classList.remove("hide");
+    let playedSong = songQueueList.shift();
+    currenltyPlayingContainer.innerHTML = "";
+    renderQueue();
+    if(songQueueList.length === 0){
+        songNameElement.textContent = "song name";
+        songArtistElement.textContent = "artist name";
+        songImageElement.src = "./images/profile.png";
+        songTimeSeekBar.value = 0;
+    }
+})
 playButton.addEventListener("click", (e) => {
     console.log("play")
     audioElement.play();
     playButton.classList.add("hide")
     pauseButton.classList.remove("hide");
 })
-
 pauseButton.addEventListener("click", (e) => {
     console.log("pause")
     audioElement.pause();
@@ -272,24 +287,15 @@ skipForwardButton.addEventListener("click", () => {
     if(newValue >= audioElement.duration) newValue = duration;
     audioElement.currentTime = newValue;
 })
-
 songTimeSeekBar.addEventListener("input", (e) => {
     audioElement.currentTime = e.target.value;
 })
-
 songVolumeSeekBar.addEventListener('input', (e) => {
     console.log(audioElement.volume, e.target.value)
     audioElement.volume = e.target.value;
 });
 
-// songHistoryList
-// songQueueList
-
-
-
 function playSong(song){
-    console.log(song);
-    console.dir(audioElement);
     audioElement.src = song.previewURL;
     songNameElement.textContent = song.name;
     songArtistElement.textContent = song.artistName;
@@ -299,10 +305,47 @@ function playSong(song){
 function updateSeekBar(){
     songTimeSeekBar.value = audioElement.currentTime;
 }
-function addSongToQueue(){
-
+function addSongToQueue(song){
+    songQueueList.push(song);
+    renderQueue()
 }
 function renderQueue(){
+    if(!currenltyPlayingContainer.firstChild && songQueueList.length > 0){
+        playSong(songQueueList[0]);
+    }
+    currenltyPlayingContainer.innerHTML = "";
+    playingNextContainer.innerHTML = "";
+    songQueueList.forEach((song,index) => {
+        const template = document.createElement("template");
+        template.innerHTML = `
+        <div class='song-queue-song-card'>
+            <img class='song-image' src='' alt=''>
+            <div class='song-queue-song-card-content'>
+                <p class='song-title'></p>
+                <p class='song-artist'></p>
+                <p class='song-duration'>30s</p>
+                <img src='./images/play-button.png' alt=''>
+            </div>
+        </div>
+        `;
+        // ${index === 0 ? "<img src='./images/play-button.png' alt=''>" : ""}
+        const element = template.content.cloneNode(true);
+        element.querySelector(
+            ".song-image"
+        ).src = `https://api.napster.com/imageserver/v2/albums/${song.albumId}/images/500x500.jpg`;
+        element.querySelector(".song-title").innerText = song.name;
+        element.querySelector(".song-artist").innerText = song.artistName;
+        
+        if(index === 0 ){
+            currenltyPlayingContainer.append(element)
+        }else{
+            playingNextContainer.append(element);
+        }
+        
+    })
+    
+}
+function addSongToPlaylist(song){
 
 }
 function playNext(){
