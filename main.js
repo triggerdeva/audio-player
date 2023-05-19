@@ -1,4 +1,9 @@
-const data = new Map([]);
+/******* 
+  Application state data
+*********/
+let data = new Map([]);
+let songQueueList = [];
+let songHistoryList = [];
 /******* 
   fetching data
 *********/
@@ -12,7 +17,6 @@ import {
     getArtistTracks,
 } from "./api.js";
 const getHomePageData = async () => {
-    console.log("fetching data");
     const tracks = await getTopTracks();
     const artists = await getPopularArtist();
     const albums = await getTopAlbums();
@@ -31,19 +35,19 @@ const getHomePageData = async () => {
 
 const homeLink = document.getElementById("home-link");
 const collectionLink = document.getElementById("collection-link");
-const historyLink = document.getElementById("history-link");
+const searchLink = document.getElementById("search-link");
 const pageContainer = document.getElementById("page-container");
 const homePage = document.getElementById("home-page");
 const collectionPage = document.getElementById("collection-page");
-const historyPage = document.getElementById("history-page");
+const searchPage = document.getElementById("search-page");
 const homeLoader = document.getElementById("home-loader");
 const collectionLoader = document.getElementById("collection-loader");
-const historyLoader = document.getElementById("history-loader");
+const searchLoader = document.getElementById("search-loader");
 const homePageContent = document.getElementById("home-page-content");
 const collectionPageContent = document.getElementById(
     "collection-page-content"
 );
-const historyPageContent = document.getElementById("history-page-content");
+const searchPageContent = document.getElementById("search-page-content");
 const topTracksContainer = document.getElementById("top-tracks-container");
 const topAlbumsContainer = document.getElementById("top-albums-container");
 const topArtistsContainer = document.getElementById("top-artists-container");
@@ -56,30 +60,29 @@ const topPlaylistsContainer = document.getElementById(
 *********/
 
 (() => {
-    console.log("setting up page router");
     homeLink.addEventListener("click", (e) => {
         homeLink.classList.add("active-link");
         collectionLink.classList.remove("active-link");
-        historyLink.classList.remove("active-link");
+        searchLink.classList.remove("active-link");
         collectionPage.classList.add("hide-page");
-        historyPage.classList.add("hide-page");
+        searchPage.classList.add("hide-page");
         homePage.classList.remove("hide-page");
     });
     collectionLink.addEventListener("click", (e) => {
         collectionLink.classList.add("active-link");
         homeLink.classList.remove("active-link");
-        historyLink.classList.remove("active-link");
+        searchLink.classList.remove("active-link");
         homePage.classList.add("hide-page");
-        historyPage.classList.add("hide-page");
+        searchPage.classList.add("hide-page");
         collectionPage.classList.remove("hide-page");
     });
-    historyLink.addEventListener("click", (e) => {
-        historyLink.classList.add("active-link");
+    searchLink.addEventListener("click", (e) => {
+        searchLink.classList.add("active-link");
         homeLink.classList.remove("active-link");
         collectionLink.classList.remove("active-link");
         homePage.classList.add("hide-page");
         collectionPage.classList.add("hide-page");
-        historyPage.classList.remove("hide-page");
+        searchPage.classList.remove("hide-page");
     });
 })();
 
@@ -101,11 +104,9 @@ async function renderTracks(container, tracksList) {
     tracks.forEach((track) => {
         container.append(getCardElement(track));
     });
-    console.log("current data is", data);
 }
 function renderAlbums(container, albumList) {
     const { albums } = albumList;
-    console.log("function 1", container, albumList);
     albums.forEach(async (album) => {
         let albumElement = await getAlbum(album);
         container.append(albumElement);
@@ -121,7 +122,6 @@ async function renderArtists(container, artistList) {
 }
 
 async function getArtist(artist) {
-    console.log("look here", artist);
     const {
         links: {
             topTracks: { href: link },
@@ -136,7 +136,6 @@ async function getAlbum(album) {
             tracks: { href: link },
         },
     } = album;
-    console.log("function 2", link);
     const albumFragment = await createAlbumFragment(link);
     return albumFragment;
 }
@@ -151,14 +150,12 @@ async function createArtistFragment(link) {
         const trackCard = await getCardElement(track);
         container.append(trackCard);
     });
-    console.log(container);
     return container;
 }
 
 async function createAlbumFragment(link) {
     const { data, error } = await getAlbumTracks(link);
     const { tracks } = await data;
-    console.log("function 3", tracks);
 
     const container = document.createElement("div");
     container.classList.add("individual-album");
@@ -166,12 +163,10 @@ async function createAlbumFragment(link) {
         const trackCard = await getCardElement(track);
         container.append(trackCard);
     });
-    console.log(container);
     return container;
 }
 
 function getCardElement(track) {
-    // console.log(data)
     data.set(track.id, track);
     const template = document.createElement("template");
     template.innerHTML = `
@@ -197,7 +192,8 @@ function getCardElement(track) {
     queueButton.dataset.id = track.id;
     playlistButton.dataset.id = track.id;
     playButton.addEventListener("click", (e) => {
-        console.log(track.id);
+        // console.log(track.id);
+        playSong(data.get(track.id))
     });
     queueButton.addEventListener("click", (e) => {
         console.log(track.id);
@@ -220,4 +216,102 @@ renderHomePage();
 /********
  * setting up the audio player
  */
+
 const audioElement = new Audio();
+
+
+/******* 
+  html audio elements selectors
+*********/
+
+const songNameElement = document.getElementById("current-song-name");
+const songArtistElement = document.getElementById("current-song-artist");
+const songImageElement = document.getElementById("current-song-image");
+
+const playButton = document.getElementById("audio-play");
+const pauseButton = document.getElementById("audio-pause");
+const skipForwardButton = document.getElementById("audio-forward");
+const skipBackwardButton = document.getElementById("audio-backward");
+const songTimeSeekBar = document.getElementById("audio-time");
+const songVolumeSeekBar = document.getElementById("audio-volume");
+
+let seekBarUpdateInterval;
+audioElement.addEventListener("canplaythrough", (event) => {
+/* the audio is now playable; play it if permissions allow */
+    songTimeSeekBar.min = 0;
+    songTimeSeekBar.max = audioElement.duration;
+    songTimeSeekBar.step = 0.1; 
+    audioElement.play();
+    seekBarUpdateInterval = setInterval(updateSeekBar,50);
+    playButton.classList.add("hide")
+    pauseButton.classList.remove("hide");
+    // when song is done playing clear the interval
+});
+
+playButton.addEventListener("click", (e) => {
+    console.log("play")
+    audioElement.play();
+    playButton.classList.add("hide")
+    pauseButton.classList.remove("hide");
+})
+
+pauseButton.addEventListener("click", (e) => {
+    console.log("pause")
+    audioElement.pause();
+    playButton.classList.remove("hide")
+    pauseButton.classList.add("hide");
+})
+skipBackwardButton.addEventListener("click", () => {
+    let newValue = audioElement.currentTime - 5;
+    if(newValue <= 0) newValue = 0;
+    if(newValue > audioElement.duration) newValue = duration;
+    audioElement.currentTime = newValue;
+})
+skipForwardButton.addEventListener("click", () => {
+    let newValue = audioElement.currentTime + 5;
+    if(newValue >= audioElement.duration) newValue = duration;
+    audioElement.currentTime = newValue;
+})
+
+songTimeSeekBar.addEventListener("input", (e) => {
+    audioElement.currentTime = e.target.value;
+})
+
+songVolumeSeekBar.addEventListener('input', (e) => {
+    console.log(audioElement.volume, e.target.value)
+    audioElement.volume = e.target.value;
+});
+
+// songHistoryList
+// songQueueList
+
+
+
+function playSong(song){
+    console.log(song);
+    console.dir(audioElement);
+    audioElement.src = song.previewURL;
+    songNameElement.textContent = song.name;
+    songArtistElement.textContent = song.artistName;
+    songImageElement.src = `https://api.napster.com/imageserver/v2/albums/${song.albumId}/images/500x500.jpg`;
+}
+
+function updateSeekBar(){
+    songTimeSeekBar.value = audioElement.currentTime;
+}
+function addSongToQueue(){
+
+}
+function renderQueue(){
+
+}
+function playNext(){
+
+}
+function playPrevious(){
+
+}
+function pauseSong(){
+
+}
+
