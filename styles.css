@@ -111,7 +111,8 @@ nav {
     width: auto;
 }
 
-#top-tracks-container {
+#top-tracks-container,
+#search-result-songs {
     display: flex;
     padding: 10px;
     border-radius: 12px;
@@ -393,6 +394,85 @@ nav {
     object-fit: cover;
     border-radius: 50%;
 }
+#collection-page-content{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    gap: 10px;
+}
+/* .collection-page-content > *{
+    flex: 0 0 200px;
+} */
+
+#search-form{
+    /* background-color: red; */
+    padding: 20px;
+    display: grid;
+    place-items: center;
+    gap: 20px
+}
+#search-form label{
+    font-size: 22px;
+    font-weight: 600;
+}
+.input-group{
+    background-color: white;
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    font-size: 16px;
+    border-radius: 30px;
+    align-items: center;
+}
+.input-group button{
+    width: max-content;
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+.input-group button:active{
+    /* border: none; */
+    /* outline: none; */
+
+}
+.input-group img{
+    height: 20px;
+    width: auto;
+}
+#search-input{
+    border: none;
+    outline: none;
+    width: 300px;
+}
+#search-input:focus{
+    border: none;
+    outline: none;
+}
+.search-options{
+    display: flex;
+    gap: 10px
+}
+.search-options button{
+    border-radius: 30px;
+    padding: 10px 10px;
+    width: 80px;
+    cursor: pointer;
+    color: #0f7ca4;
+    border: none;
+    background-color: white;
+    transition: background-color .3s ease;
+    font-size: 16px;
+    transition: .3s ease color;
+}
+.search-options button:hover{
+    background-color: #006990;
+    color: white;
+}
+.search-options button.selected{
+    background-color: #0f7ca4;
+    color: white;  
+}
+
 
 .hide-page {
     display: none;

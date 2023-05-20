@@ -4,6 +4,8 @@
 let data = new Map([]);
 let songQueueList = [];
 let songHistoryList = [];
+let songCollectionList = [];
+let searchCategory = "all";
 /******* 
   fetching data
 *********/
@@ -53,8 +55,14 @@ const topAlbumsContainer = document.getElementById("top-albums-container");
 const topArtistsContainer = document.getElementById("top-artists-container");
 const topPlaylistsContainer = document.getElementById(
     "top-playlists-container"
-);
+    );
+const songCollectionListContainer = document.getElementById("collection-page-content");
+const searchForm = document.getElementById("search-form");
+const searchInput = document.getElementById("search-input");
 
+const searchResultSongs = document.getElementById("search-result-songs");
+const searchResultAlbums = document.getElementById("search-result-albums");
+const searchResultArtists = document.getElementById("search-result-artists");
 /******* 
   page router
 *********/
@@ -193,7 +201,10 @@ function getCardElement(track) {
     playlistButton.dataset.id = track.id;
     playButton.addEventListener("click", (e) => {
         // console.log(track.id);
-        playSong(data.get(track.id))
+        // songQueueList.unshift(data.get(track.id));
+        songQueueList[0] = data.get(track.id);
+        renderQueue()
+        playSong(songQueueList[0])
     });
     queueButton.addEventListener("click", (e) => {
         addSongToQueue(data.get(track.id));
@@ -204,14 +215,42 @@ function getCardElement(track) {
     return element;
 }
 
+function renderCollectionPage() {
+    songCollectionListContainer.innerHTML = "";
+    console.log("current playlist list", songCollectionList);
+    collectionLoader.classList.add("hide");
+    songCollectionList.forEach((song,index) => {
+        console.log(index);
+        songCollectionListContainer.append(getCardElement(song));
+    })
+}
+
 /**********
  * Evnet listner
  ***********/
+
+searchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    searchLoader.classList.remove("hide");
+    getSearchResult()
+})
+
+const getSearchResult = async() => {
+    const {data, error} = await searchSong(searchInput.value, searchCategory);
+    if(!error){
+        let {search : {data : {albums, artists,tracks}}} = await data;
+        console.log(albums, artists,tracks)
+        renderSearchResult({albums, artists,tracks});
+    }else{
+        console.log("error fetching");
+    }
+}
 
 /********
  * loading the app
  */
 renderHomePage();
+renderCollectionPage();
 
 /********
  * setting up the audio player
@@ -296,6 +335,7 @@ songVolumeSeekBar.addEventListener('input', (e) => {
 });
 
 function playSong(song){
+    console.log(song);
     audioElement.src = song.previewURL;
     songNameElement.textContent = song.name;
     songArtistElement.textContent = song.artistName;
@@ -346,15 +386,69 @@ function renderQueue(){
     
 }
 function addSongToPlaylist(song){
-
+    songCollectionList.push(song);
+    renderCollectionPage();
 }
-function playNext(){
 
-}
-function playPrevious(){
-
-}
-function pauseSong(){
+function filterSearchResult(current){
 
 }
 
+function renderSearchResult({albums, artists,tracks}){
+    searchLoader.classList.add("hide");
+    searchResultAlbums.innerHTML = "";
+    searchResultArtists.innerHTML = "";
+    searchResultSongs.innerHTML="";
+    if(albums && albums.length > 0){
+        const title = document.createElement('h2');
+        title.textContent = "Albums matching the query"
+        searchResultAlbums.insertAdjacentElement("beforebegin",title);
+        renderAlbums(searchResultAlbums,{albums})
+    }
+    if(artists && artists.length > 0){
+        const title = document.createElement('h2');
+        title.textContent = "artists matching the query"
+        searchResultArtists.insertAdjacentElement("beforebegin",title);
+        renderArtists(searchResultArtists,{artists})
+    }
+    if(tracks && tracks.length > 0){
+        const title = document.createElement('h2');
+        title.textContent = "songs matching the query"
+        searchResultSongs.insertAdjacentElement("beforebegin",title);
+        renderTracks(searchResultSongs,{tracks})
+    }
+}
+
+/***************
+ *  search page router
+ * *************/
+// getSearchResult
+const allSearchLink = document.getElementById("search-all-link");
+const tracksSearchLink = document.getElementById("search-tracks-link");
+const artistsSearchLink = document.getElementById("search-artists-link");
+(() => {
+    allSearchLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        allSearchLink.classList.add("selected")
+        tracksSearchLink.classList.remove("selected")
+        artistsSearchLink.classList.remove("selected")
+        searchCategory = "all";
+        getSearchResult()
+    });
+    tracksSearchLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        tracksSearchLink.classList.add("selected")
+        allSearchLink.classList.remove("selected")
+        artistsSearchLink.classList.remove("selected")
+        searchCategory = "album";
+        getSearchResult()
+    });
+    artistsSearchLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        artistsSearchLink.classList.add("selected")
+        allSearchLink.classList.remove("selected")
+        tracksSearchLink.classList.remove("selected")
+        searchCategory = "artist";
+        getSearchResult()
+    });
+})();

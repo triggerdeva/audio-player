@@ -60,11 +60,12 @@ export const getTopAlbums = async () => {
 };
 
 export const searchSong = async (query, type) => {
+    
     try {
         //  album, artist, track, tag, playlist.
-        const fetchURL =
-            "https://napi-v2-2-cloud-run-b3gtd5nmxq-uw.a.run.app/v2.2/search?apikey=${API_KEY}&per_type_limit=5";
-        if (type && type !== "all") fetchURL += `&type=${type}`;
+        let fetchURL =
+            `https://napi-v2-2-cloud-run-b3gtd5nmxq-uw.a.run.app/v2.2/search?apikey=${API_KEY}&per_type_limit=5&query=${query}`;
+        if (type && type !== "all" && ( type === "album" || type === "artist" || type === "track")) fetchURL += `&type=${type}`;
         const data = await fetch(fetchURL);
         return { data: data.json(), error: null };
     } catch (error) {
