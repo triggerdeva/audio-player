@@ -55,8 +55,10 @@ const topAlbumsContainer = document.getElementById("top-albums-container");
 const topArtistsContainer = document.getElementById("top-artists-container");
 const topPlaylistsContainer = document.getElementById(
     "top-playlists-container"
-    );
-const songCollectionListContainer = document.getElementById("collection-page-content");
+);
+const songCollectionListContainer = document.getElementById(
+    "collection-page-content"
+);
 const searchForm = document.getElementById("search-form");
 const searchInput = document.getElementById("search-input");
 
@@ -203,8 +205,8 @@ function getCardElement(track) {
         // console.log(track.id);
         // songQueueList.unshift(data.get(track.id));
         songQueueList[0] = data.get(track.id);
-        renderQueue()
-        playSong(songQueueList[0])
+        renderQueue();
+        playSong(songQueueList[0]);
     });
     queueButton.addEventListener("click", (e) => {
         addSongToQueue(data.get(track.id));
@@ -219,10 +221,10 @@ function renderCollectionPage() {
     songCollectionListContainer.innerHTML = "";
     console.log("current playlist list", songCollectionList);
     collectionLoader.classList.add("hide");
-    songCollectionList.forEach((song,index) => {
+    songCollectionList.forEach((song, index) => {
         console.log(index);
         songCollectionListContainer.append(getCardElement(song));
-    })
+    });
 }
 
 /**********
@@ -232,19 +234,23 @@ function renderCollectionPage() {
 searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
     searchLoader.classList.remove("hide");
-    getSearchResult()
-})
+    getSearchResult();
+});
 
-const getSearchResult = async() => {
-    const {data, error} = await searchSong(searchInput.value, searchCategory);
-    if(!error){
-        let {search : {data : {albums, artists,tracks}}} = await data;
-        console.log(albums, artists,tracks)
-        renderSearchResult({albums, artists,tracks});
-    }else{
+const getSearchResult = async () => {
+    const { data, error } = await searchSong(searchInput.value, "all");
+    if (!error) {
+        let {
+            search: {
+                data: { albums, artists, tracks },
+            },
+        } = await data;
+        console.log(albums, artists, tracks);
+        renderSearchResult({ albums, artists, tracks });
+    } else {
         console.log("error fetching");
     }
-}
+};
 
 /********
  * loading the app
@@ -258,15 +264,13 @@ renderCollectionPage();
 
 const audioElement = new Audio();
 
-
 /******* 
   html audio elements selectors
 *********/
 
 const songNameElement = document.getElementById("current-song-name");
 const songArtistElement = document.getElementById("current-song-artist");
-const songImageElement = document.getElementById("current-song-image")
-;
+const songImageElement = document.getElementById("current-song-image");
 const currenltyPlayingContainer = document.getElementById("currently-playing");
 const playingNextContainer = document.getElementById("playing-next");
 
@@ -279,62 +283,62 @@ const songVolumeSeekBar = document.getElementById("audio-volume");
 
 let seekBarUpdateInterval;
 audioElement.addEventListener("canplaythrough", (event) => {
-/* the audio is now playable; play it if permissions allow */
+    /* the audio is now playable; play it if permissions allow */
     songTimeSeekBar.min = 0;
     songTimeSeekBar.max = audioElement.duration;
-    songTimeSeekBar.step = 0.1; 
+    songTimeSeekBar.step = 0.1;
     audioElement.play();
-    seekBarUpdateInterval = setInterval(updateSeekBar,50);
-    playButton.classList.add("hide")
+    seekBarUpdateInterval = setInterval(updateSeekBar, 50);
+    playButton.classList.add("hide");
     pauseButton.classList.remove("hide");
     // when song is done playing clear the interval
 });
 audioElement.addEventListener("ended", () => {
     console.log("ended running");
-    playButton.classList.add("hide")
+    playButton.classList.add("hide");
     pauseButton.classList.remove("hide");
     let playedSong = songQueueList.shift();
     currenltyPlayingContainer.innerHTML = "";
     renderQueue();
-    if(songQueueList.length === 0){
+    if (songQueueList.length === 0) {
         songNameElement.textContent = "song name";
         songArtistElement.textContent = "artist name";
         songImageElement.src = "./images/profile.png";
         songTimeSeekBar.value = 0;
     }
-})
+});
 playButton.addEventListener("click", (e) => {
-    console.log("play")
+    console.log("play");
     audioElement.play();
-    playButton.classList.add("hide")
+    playButton.classList.add("hide");
     pauseButton.classList.remove("hide");
-})
+});
 pauseButton.addEventListener("click", (e) => {
-    console.log("pause")
+    console.log("pause");
     audioElement.pause();
-    playButton.classList.remove("hide")
+    playButton.classList.remove("hide");
     pauseButton.classList.add("hide");
-})
+});
 skipBackwardButton.addEventListener("click", () => {
     let newValue = audioElement.currentTime - 5;
-    if(newValue <= 0) newValue = 0;
-    if(newValue > audioElement.duration) newValue = duration;
+    if (newValue <= 0) newValue = 0;
+    if (newValue > audioElement.duration) newValue = duration;
     audioElement.currentTime = newValue;
-})
+});
 skipForwardButton.addEventListener("click", () => {
     let newValue = audioElement.currentTime + 5;
-    if(newValue >= audioElement.duration) newValue = duration;
+    if (newValue >= audioElement.duration) newValue = duration;
     audioElement.currentTime = newValue;
-})
+});
 songTimeSeekBar.addEventListener("input", (e) => {
     audioElement.currentTime = e.target.value;
-})
-songVolumeSeekBar.addEventListener('input', (e) => {
-    console.log(audioElement.volume, e.target.value)
+});
+songVolumeSeekBar.addEventListener("input", (e) => {
+    console.log(audioElement.volume, e.target.value);
     audioElement.volume = e.target.value;
 });
 
-function playSong(song){
+function playSong(song) {
     console.log(song);
     audioElement.src = song.previewURL;
     songNameElement.textContent = song.name;
@@ -342,20 +346,20 @@ function playSong(song){
     songImageElement.src = `https://api.napster.com/imageserver/v2/albums/${song.albumId}/images/500x500.jpg`;
 }
 
-function updateSeekBar(){
+function updateSeekBar() {
     songTimeSeekBar.value = audioElement.currentTime;
 }
-function addSongToQueue(song){
+function addSongToQueue(song) {
     songQueueList.push(song);
-    renderQueue()
+    renderQueue();
 }
-function renderQueue(){
-    if(!currenltyPlayingContainer.firstChild && songQueueList.length > 0){
+function renderQueue() {
+    if (!currenltyPlayingContainer.firstChild && songQueueList.length > 0) {
         playSong(songQueueList[0]);
     }
     currenltyPlayingContainer.innerHTML = "";
     playingNextContainer.innerHTML = "";
-    songQueueList.forEach((song,index) => {
+    songQueueList.forEach((song, index) => {
         const template = document.createElement("template");
         template.innerHTML = `
         <div class='song-queue-song-card'>
@@ -375,47 +379,56 @@ function renderQueue(){
         ).src = `https://api.napster.com/imageserver/v2/albums/${song.albumId}/images/500x500.jpg`;
         element.querySelector(".song-title").innerText = song.name;
         element.querySelector(".song-artist").innerText = song.artistName;
-        
-        if(index === 0 ){
-            currenltyPlayingContainer.append(element)
-        }else{
+
+        if (index === 0) {
+            currenltyPlayingContainer.append(element);
+        } else {
             playingNextContainer.append(element);
         }
-        
-    })
-    
+    });
 }
-function addSongToPlaylist(song){
+function addSongToPlaylist(song) {
     songCollectionList.push(song);
     renderCollectionPage();
 }
 
-function filterSearchResult(current){
+function filterSearchResult(current) {}
 
-}
-
-function renderSearchResult({albums, artists,tracks}){
+function renderSearchResult({ albums, artists, tracks }) {
     searchLoader.classList.add("hide");
     searchResultAlbums.innerHTML = "";
     searchResultArtists.innerHTML = "";
-    searchResultSongs.innerHTML="";
-    if(albums && albums.length > 0){
-        const title = document.createElement('h2');
-        title.textContent = "Albums matching the query"
-        searchResultAlbums.insertAdjacentElement("beforebegin",title);
-        renderAlbums(searchResultAlbums,{albums})
+    searchResultSongs.innerHTML = "";
+    searchPage.querySelectorAll("h2").forEach((element) => {
+        element.remove();
+    });
+    console.log("albums here", albums);
+    if (
+        (albums && albums.length > 0 && searchCategory === "albums") ||
+        searchCategory === "all"
+    ) {
+        const title = document.createElement("h2");
+        title.textContent = "Albums matching the query";
+        searchResultAlbums.insertAdjacentElement("beforebegin", title);
+        renderAlbums(searchResultAlbums, { albums });
     }
-    if(artists && artists.length > 0){
-        const title = document.createElement('h2');
-        title.textContent = "artists matching the query"
-        searchResultArtists.insertAdjacentElement("beforebegin",title);
-        renderArtists(searchResultArtists,{artists})
+    if (
+        (artists && artists.length > 0 && searchCategory === "artists") ||
+        searchCategory === "all"
+    ) {
+        const title = document.createElement("h2");
+        title.textContent = "artists matching the query";
+        searchResultArtists.insertAdjacentElement("beforebegin", title);
+        renderArtists(searchResultArtists, { artists });
     }
-    if(tracks && tracks.length > 0){
-        const title = document.createElement('h2');
-        title.textContent = "songs matching the query"
-        searchResultSongs.insertAdjacentElement("beforebegin",title);
-        renderTracks(searchResultSongs,{tracks})
+    if (
+        (tracks && tracks.length > 0 && searchCategory === "tracks") ||
+        searchCategory === "all"
+    ) {
+        const title = document.createElement("h2");
+        title.textContent = "songs matching the query";
+        searchResultSongs.insertAdjacentElement("beforebegin", title);
+        renderTracks(searchResultSongs, { tracks });
     }
 }
 
@@ -426,29 +439,42 @@ function renderSearchResult({albums, artists,tracks}){
 const allSearchLink = document.getElementById("search-all-link");
 const tracksSearchLink = document.getElementById("search-tracks-link");
 const artistsSearchLink = document.getElementById("search-artists-link");
+const albumsSearchLink = document.getElementById("search-albums-link");
 (() => {
     allSearchLink.addEventListener("click", (e) => {
         e.preventDefault();
-        allSearchLink.classList.add("selected")
-        tracksSearchLink.classList.remove("selected")
-        artistsSearchLink.classList.remove("selected")
         searchCategory = "all";
-        getSearchResult()
+        allSearchLink.classList.add("selected");
+        tracksSearchLink.classList.remove("selected");
+        artistsSearchLink.classList.remove("selected");
+        albumsSearchLink.classList.remove("selected");
+        getSearchResult();
     });
     tracksSearchLink.addEventListener("click", (e) => {
         e.preventDefault();
-        tracksSearchLink.classList.add("selected")
-        allSearchLink.classList.remove("selected")
-        artistsSearchLink.classList.remove("selected")
-        searchCategory = "album";
-        getSearchResult()
+        searchCategory = "tracks";
+        tracksSearchLink.classList.add("selected");
+        allSearchLink.classList.remove("selected");
+        artistsSearchLink.classList.remove("selected");
+        albumsSearchLink.classList.remove("selected");
+        getSearchResult();
     });
     artistsSearchLink.addEventListener("click", (e) => {
         e.preventDefault();
-        artistsSearchLink.classList.add("selected")
-        allSearchLink.classList.remove("selected")
-        tracksSearchLink.classList.remove("selected")
-        searchCategory = "artist";
-        getSearchResult()
+        searchCategory = "artists";
+        artistsSearchLink.classList.add("selected");
+        allSearchLink.classList.remove("selected");
+        tracksSearchLink.classList.remove("selected");
+        albumsSearchLink.classList.remove("selected");
+        getSearchResult();
+    });
+    albumsSearchLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        searchCategory = "albums";
+        albumsSearchLink.classList.add("selected");
+        artistsSearchLink.classList.remove("selected");
+        allSearchLink.classList.remove("selected");
+        tracksSearchLink.classList.remove("selected");
+        getSearchResult();
     });
 })();
