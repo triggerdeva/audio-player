@@ -280,6 +280,22 @@ const skipForwardButton = document.getElementById("audio-forward");
 const skipBackwardButton = document.getElementById("audio-backward");
 const songTimeSeekBar = document.getElementById("audio-time");
 const songVolumeSeekBar = document.getElementById("audio-volume");
+const Volup = document.getElementById("volup");
+const Voldowm= document.getElementById("voldown");
+Volup.addEventListener("click",()=>{
+    if(audioElement.volume<=1){
+    songVolumeSeekBar.value = songVolumeSeekBar.value + 0.1
+        audioElement.volume = audioElement.volume+0.1
+    }
+});
+Voldowm.addEventListener("click",()=>{
+    if(audioElement.volume>=0){
+        songVolumeSeekBar.value = songVolumeSeekBar.value - 0.1
+        audioElement.volume = audioElement.volume-0.1
+    }
+    
+});
+
 
 let seekBarUpdateInterval;
 audioElement.addEventListener("canplaythrough", (event) => {
